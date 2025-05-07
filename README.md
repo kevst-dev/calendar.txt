@@ -32,7 +32,6 @@ mvn install:install-file \
     -Dpackaging=jar
 ```
 
-
 ## 4. Como utilizar
 
 - [ ] Aun no esta definida la forma en que se va a utilizar el proyecto, queda pendiente decidirlo.
@@ -68,7 +67,7 @@ Puedes encontrar mucho mas de como utilizar este proyecto en nuestra Link a la w
 El proyecto se encuentra en la version `v0.0.1`, esta version ...
 
 ## 8. Autores
- 
+
 - **kevst-dev** (usuario GitHub)
 
 ## 9. Licencia
