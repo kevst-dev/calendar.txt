@@ -6,6 +6,31 @@ import datetime
 import re
 
 
+class InvalidEventFormatError(Exception):
+    """Error para indicar que el formato general de la línea de evento es inválido."""
+
+    def __init__(self, message: str, line: str):
+        """Init."""
+        self.line = line
+        self.message = message
+
+        super().__init__(f"{self.message}: '{self.line}'")
+
+
+class InvalidEventTimeLogicError(Exception):
+    """Error para lógica de tiempo inválida (e.g., end_time < start_time)."""
+
+    def __init__(self, message: str):
+        """Init."""
+        self.message = message
+
+        msg_lines = [
+            f"Formato de hora '{self.time_string}', para la linea {self.line}",
+            "es inválido, el formato debe ser (HH:MM).",
+        ]
+        super().__init__(" ".join(msg_lines))
+
+
 class Event:
     """Representa una línea de evento/tarea dentro de un día."""
 
@@ -72,6 +97,17 @@ class Event:
             and self.tag == object.tag
         )
 
+    @staticmethod
+    def _ensure_line_format(line: str) -> None:
+        strip_line = line.strip()
+        if not strip_line.startswith("+"):
+            msg = "La línea de evento debe empezar con '+'"
+            raise InvalidEventFormatError(msg, line)
+
+        if strip_line == "+":
+            msg = "La línea de evento no puede estar vacía"
+            raise InvalidEventFormatError(msg, line)
+
     @classmethod
     def from_string(cls, line: str) -> Event:
         """
@@ -90,16 +126,12 @@ class Event:
                         o no empieza con '+'.
 
         """
-        line = line.strip()
-        if not line.startswith("+"):
-            msg = f"La línea de evento debe empezar con '+': '{line}'"
-            raise ValueError(msg)
-
-        match = cls.EVENT_LINE_REGEX.match(line)
+        cls._ensure_line_format(line)
+        match = cls.EVENT_LINE_REGEX.match(line.strip())
 
         if not match:
-            msg = f"Formato de línea de evento no válido: '{line}'"
-            raise ValueError(msg)
+            msg = "Formato de línea de evento no válido"
+            raise InvalidEventFormatError(msg, line)
 
         start_str, end_str, tag_with_hash, desc_str = match.groups()
 
